@@ -1,6 +1,6 @@
 import express from 'express';
 import { LoginInvalido, ErrorResponse } from '../model';
-import LoginController from './login'
+import LoginController from './loginController'
 
 const router = express.Router();
 
