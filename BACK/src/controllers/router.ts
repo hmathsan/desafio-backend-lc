@@ -22,13 +22,25 @@ router.post('/login', async (req, res) => {
     }
 })
 
-router.get('/cards', authenticate, async (req, res) => {
+router.get('/cards', authenticate, async (_req, res) => {
     const controller = new CardsController();
     try {
         const response = await controller.getCards();
         return res.json(response)
     } catch(e) {
-        res.status(500).json(e)
+        const response: ErrorResponse = {message: "Erro desconhecido: " + e}
+        res.status(500).json(response)
+    }
+})
+
+router.post('/cards', authenticate, async (req, res) => {
+    const controller = new CardsController();
+    try {
+        const response = await controller.createNewCard(req.body);
+        return res.status(201).json(response).location('/cards/' + response.id)
+    } catch (e) {
+        const response: ErrorResponse = {message: "Erro desconhecido: " + e}
+        res.status(500).json(response)
     }
 })
 

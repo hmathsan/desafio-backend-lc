@@ -2,10 +2,12 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import morgan from 'morgan';
 import express from 'express';
+import { createConnection } from 'typeorm';
 import swaggerUi from 'swagger-ui-express';
 import {Express} from 'express-serve-static-core';
 
 import Router from '../controllers/router';
+import dbConfig from './dbConfig';
 
 dotenv.config();
 
@@ -41,6 +43,8 @@ export async function initServer(): Promise<Express> {
     }))
 
     server.use(Router);
+
+    createConnection(dbConfig)
 
     return server;
 }
