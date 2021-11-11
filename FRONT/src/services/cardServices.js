@@ -20,7 +20,7 @@ const useCardService = () => {
             headers: DEFAULT_HEADERS,
         })
             .then(toJson)
-            .then(token => `Bearer ${token}`)
+            .then(token => `Bearer ${token.token}`)
             .then(token => ({ Authorization: token }))
             .catch(console.error);
     };
@@ -32,8 +32,9 @@ const useCardService = () => {
     }
 
     const getCards = async () => {
+        
         if (!authHeader) await getToken();
-
+        
         return await fetch(CARD_URL, { headers: authHeader })
             .then(res => {
                 if (res.status === 200) return res.json();
