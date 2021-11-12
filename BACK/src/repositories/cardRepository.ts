@@ -1,6 +1,7 @@
 import { getRepository } from "typeorm";
-import { Card } from "../model";
 import { v4 as uuid} from 'uuid';
+
+import { Card, CardNaoEncontrado } from "../model";
 
 export interface ICardPayload {
     titulo: string,
@@ -10,7 +11,17 @@ export interface ICardPayload {
 
 export const getAllCards = async (): Promise<Array<Card>> => {
     const cardRepository = getRepository(Card);
-    return cardRepository.find();
+    return await cardRepository.find();
+}
+
+export const getCardById = async (id: string): Promise<Card> => {
+    const cardRepository = getRepository(Card);
+    const card = await cardRepository.findOne(id);
+    if(card) {
+        return card!;
+    } else {
+        throw new CardNaoEncontrado("Card de id " + id + " não encontrado.");
+    }
 }
 
 export const createCard = async (payload: ICardPayload): Promise<Card> => {
@@ -21,15 +32,30 @@ export const createCard = async (payload: ICardPayload): Promise<Card> => {
         payload.conteudo,
         payload.lista
     );
-    return cardRepository.save({ ...card });
+    return await cardRepository.save({ ...card });
 }
 
-export const updateCard = async (card: Card): Promise<Card> => {
+export const updateCardById = async (card: Card): Promise<Card> => {
     const cardRepository = getRepository(Card);
-    return cardRepository.save({ ...card });
+    const cardById = await cardRepository.findOne(card.id);
+    if(cardById) {
+        return cardRepository.save({ ...card });
+    } else {
+        throw new CardNaoEncontrado("Card de id " + card.id + " não encontrado.");
+    }
 }
 
-export const deleteCard = async (card: Card) => {
+export const deleteCard = async (id: string): Promise<Array<Card>> => {
     const cardRepository = getRepository(Card);
-    cardRepository.delete(card);
+    console.log("cardById");
+    const cardById = await cardRepository.findOne(id);
+    if (cardById) {
+        console.log("deletando card");
+        await cardRepository.delete(id);
+        console.log("retornando cards");
+        return await cardRepository.find()
+    } else {
+        throw new CardNaoEncontrado("Card de id " + id + " não encontrado.")
+    }
+
 }

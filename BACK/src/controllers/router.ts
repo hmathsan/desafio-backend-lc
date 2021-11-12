@@ -1,5 +1,6 @@
 import express from 'express';
-import { LoginInvalido, ErrorResponse } from '../model';
+
+import { LoginInvalido, ErrorResponse, CardNaoEncontrado } from '../model';
 import LoginController from './loginController'
 import {authenticate} from '../services'
 import CardsController from './cardsController';
@@ -14,7 +15,7 @@ router.post('/login', async (req, res) => {
     } catch(e) {
         if (e instanceof LoginInvalido) {
             const response: ErrorResponse = {message: e.message}
-            res.status(403).json(response)
+            return res.status(403).json(response)
         }
         
         const response: ErrorResponse = {message: "Erro desconhecido: " + e}
@@ -39,6 +40,36 @@ router.post('/cards', authenticate, async (req, res) => {
         const response = await controller.createNewCard(req.body);
         return res.status(201).json(response).location('/cards/' + response.id)
     } catch (e) {
+        const response: ErrorResponse = {message: "Erro desconhecido: " + e}
+        res.status(500).json(response)
+    }
+})
+
+router.put('/cards/:cardId', authenticate, async (req, res) => {
+    const controller = new CardsController();
+    try {
+        const response = await controller.updateCard(req.params.cardId, req.body)
+        return res.json(response)
+    } catch (e) {
+        if(e instanceof CardNaoEncontrado) {
+            const response: ErrorResponse = {message: e.message}
+            return res.status(404).json(response)
+        }
+        const response: ErrorResponse = {message: "Erro desconhecido: " + e}
+        res.status(500).json(response)
+    }
+})
+
+router.delete('/cards/:cardId', authenticate, async (req, res) => {
+    const controller = new CardsController();
+    try {
+        const response = await controller.deleteCard(req.params.cardId);
+        return res.json(response);
+    }catch (e) {
+        if(e instanceof CardNaoEncontrado) {
+            const response: ErrorResponse = {message: e.message}
+            return res.status(404).json(response)
+        }
         const response: ErrorResponse = {message: "Erro desconhecido: " + e}
         res.status(500).json(response)
     }

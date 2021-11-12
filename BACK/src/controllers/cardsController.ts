@@ -1,6 +1,4 @@
-import { v4 as uuid } from 'uuid'
-import { Request, Response } from "express";
-import { getAllCards, createCard, ICardPayload } from '../repositories'
+import { getAllCards, createCard, updateCardById, deleteCard, ICardPayload } from '../repositories'
 
 export type CardsResponse = {
     id: string,
@@ -18,11 +16,11 @@ export default class CardsController {
         return await createCard(body);
     }
 
-    public async updateCard(_id: string): Promise<CardsResponse> {
-        return { id: "", titulo: "", conteudo: "", lista: "" }
+    public async updateCard(id: string, body: ICardPayload): Promise<CardsResponse> {
+        return await updateCardById({id, ...body})
     }
 
-    public async deleteCard(_id: string) {
-        
+    public async deleteCard(id: string) {
+        return await deleteCard(id);
     }
 }
