@@ -1,13 +1,7 @@
 import { getRepository } from "typeorm";
 import { v4 as uuid} from 'uuid';
 
-import { Card, CardNaoEncontrado } from "../model";
-
-export interface ICardPayload {
-    titulo: string,
-    conteudo: string,
-    lista: string
-}
+import { Card, CardNaoEncontrado, CardRequest } from "../model";
 
 export const getAllCards = async (): Promise<Array<Card>> => {
     const cardRepository = getRepository(Card);
@@ -24,7 +18,7 @@ export const getCardById = async (id: string): Promise<Card> => {
     }
 }
 
-export const createCard = async (payload: ICardPayload): Promise<Card> => {
+export const createCard = async (payload: CardRequest): Promise<Card> => {
     const cardRepository = getRepository(Card);
     const card = new Card(
         uuid(),

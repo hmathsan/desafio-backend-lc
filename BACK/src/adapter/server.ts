@@ -5,8 +5,9 @@ import express from 'express';
 import { createConnection } from 'typeorm';
 import swaggerUi from 'swagger-ui-express';
 import {Express} from 'express-serve-static-core';
+import method_override from 'method-override';
 
-import Router from '../controllers/router';
+import { router, exceptionHandler } from '../controllers'
 import dbConfig from './dbConfig';
 
 dotenv.config();
@@ -20,31 +21,27 @@ export async function initServer(): Promise<Express> {
 
     const server = express();
 
-    server.use(express.json());
     server.use(express.urlencoded({extended: false}));
+    server.use(express.json());
+    server.use(method_override());
+    
     server.use(cors())
-
+    
     server.use(express.static("public"));
-
+    
     server.use(morgan('combined'));
-
-    server.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-        res.status(err.status).json({
-            error: {
-                message: err.message
-            }
-        })
-    });
-
+    
     server.use("/docs", swaggerUi.serve, swaggerUi.setup(undefined, {
         swaggerOptions: {
             url: "/swagger.json"
         }
     }))
-
-    server.use(Router);
-
+    
+    server.use(router);
+    
     createConnection(dbConfig)
+    
+    server.use(exceptionHandler);
 
     return server;
 }

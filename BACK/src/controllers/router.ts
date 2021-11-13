@@ -1,78 +1,60 @@
 import express from 'express';
 
 import { LoginInvalido, ErrorResponse, CardNaoEncontrado } from '../model';
-import LoginController from './loginController'
+import { LoginController, CardsController } from '../controllers'
 import {authenticate} from '../services'
-import CardsController from './cardsController';
 
-const router = express.Router();
+export const router = express.Router();
 
-router.post('/login', async (req, res) => {
-    const controller = new LoginController();
+router.post('/login', async (req, res, next) => {
     try {
+        const controller = new LoginController();
         const response = await controller.login(req.body);
-        return res.json(response);
-    } catch(e) {
-        if (e instanceof LoginInvalido) {
-            const response: ErrorResponse = {message: e.message}
-            return res.status(403).json(response)
-        }
-        
-        const response: ErrorResponse = {message: "Erro desconhecido: " + e}
-        res.status(500).json(response)
+        return res.json(response);    
+    }catch(err) {
+        next(err)
     }
 })
 
-router.get('/cards', authenticate, async (_req, res) => {
+router.get('/cards', authenticate, async (_req, res, next) => {
     const controller = new CardsController();
     try {
         const response = await controller.getCards();
         return res.json(response)
-    } catch(e) {
-        const response: ErrorResponse = {message: "Erro desconhecido: " + e}
-        res.status(500).json(response)
+    } catch(err) {
+        next(err)
     }
 })
 
 //TODO: Validação dos campos de entrada
-router.post('/cards', authenticate, async (req, res) => {
+router.post('/cards', authenticate, async (req, res, next) => {
     const controller = new CardsController();
     try {
         const response = await controller.createNewCard(req.body);
         return res.status(201).location('/cards/' + response.id).json(response)
-    } catch (e) {
-        const response: ErrorResponse = {message: "Erro desconhecido: " + e}
-        res.status(500).json(response)
+    } catch (err) {
+        next(err)
     }
 })
 
-router.put('/cards/:cardId', authenticate, async (req, res) => {
+router.put('/cards/:cardId', authenticate, async (req, res, next) => {
     const controller = new CardsController();
     try {
         const response = await controller.updateCard(req.params.cardId, req.body)
         return res.json(response)
-    } catch (e) {
-        if(e instanceof CardNaoEncontrado) {
-            const response: ErrorResponse = {message: e.message}
-            return res.status(404).json(response)
-        }
-        const response: ErrorResponse = {message: "Erro desconhecido: " + e}
-        res.status(500).json(response)
+    } catch (err) {
+        console.log(err)
+        next(err)
     }
 })
 
-router.delete('/cards/:cardId', authenticate, async (req, res) => {
+router.delete('/cards/:cardId', authenticate, async (req, res, next) => {
     const controller = new CardsController();
     try {
         const response = await controller.deleteCard(req.params.cardId);
         return res.json(response);
-    }catch (e) {
-        if(e instanceof CardNaoEncontrado) {
-            const response: ErrorResponse = {message: e.message}
-            return res.status(404).json(response)
-        }
-        const response: ErrorResponse = {message: "Erro desconhecido: " + e}
-        res.status(500).json(response)
+    }catch (err) {
+        next(err)
     }
 })
 

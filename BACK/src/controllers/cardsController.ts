@@ -1,26 +1,34 @@
-import { getAllCards, createCard, updateCardById, deleteCard, ICardPayload } from '../repositories'
+import { getAllCards, createCard, updateCardById, deleteCard } from '../repositories'
+import { Route, Post, Get, Put, Path, Delete, Body, SuccessResponse, Response } from 'tsoa';
+import { CardRequest, CardResponse, ErrorResponse } from '../model'
 
-export type CardsResponse = {
-    id: string,
-    titulo: string,
-    conteudo: string,
-    lista: string
-}
-
-export default class CardsController {
-    public async getCards(): Promise<Array<CardsResponse>> {
+@Route('cards')
+export class CardsController {
+    @Get()
+    @SuccessResponse('200')
+    public async getCards(): Promise<Array<CardResponse>> {
         return await getAllCards();
     }
 
-    public async createNewCard(body: ICardPayload): Promise<CardsResponse> {
+    @Post()
+    @SuccessResponse('201')
+    @Response<ErrorResponse>(400, 'Bad Request')
+    public async createNewCard(@Body() body: CardRequest): Promise<CardResponse> {
         return await createCard(body);
     }
 
-    public async updateCard(id: string, body: ICardPayload): Promise<CardsResponse> {
+    @Put('{cardId}')
+    @Response<ErrorResponse>(400, 'Bad Request')
+    @Response<ErrorResponse>(404, 'Not Found')
+    public async updateCard(@Path('cardId') id: string, @Body() body: CardRequest): Promise<CardResponse> {
         return await updateCardById({id, ...body})
     }
 
-    public async deleteCard(id: string) {
+    @Delete('{cardId}')
+    @Response<ErrorResponse>(404, 'Not Found')
+    public async deleteCard(@Path('cardId') id: string): Promise<Array<CardResponse>> {
         return await deleteCard(id);
     }
 }
+
+export default CardsController

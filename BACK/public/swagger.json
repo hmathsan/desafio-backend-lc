@@ -6,7 +6,30 @@
 		"requestBodies": {},
 		"responses": {},
 		"schemas": {
-			"LoginResponse": {
+			"CardResponse": {
+				"properties": {
+					"lista": {
+						"type": "string"
+					},
+					"conteudo": {
+						"type": "string"
+					},
+					"titulo": {
+						"type": "string"
+					},
+					"id": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"lista",
+					"conteudo",
+					"titulo",
+					"id"
+				],
+				"type": "object"
+			},
+			"ErrorResponse": {
 				"properties": {
 					"message": {
 						"type": "string"
@@ -15,8 +38,56 @@
 				"required": [
 					"message"
 				],
-				"type": "object",
-				"additionalProperties": false
+				"type": "object"
+			},
+			"CardRequest": {
+				"properties": {
+					"lista": {
+						"type": "string"
+					},
+					"conteudo": {
+						"type": "string"
+					},
+					"titulo": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"lista",
+					"conteudo",
+					"titulo"
+				],
+				"type": "object"
+			},
+			"LoginResponse": {
+				"properties": {
+					"expiresIn": {
+						"type": "string"
+					},
+					"token": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"expiresIn",
+					"token"
+				],
+				"type": "object"
+			},
+			"LoginRequest": {
+				"properties": {
+					"senha": {
+						"type": "string"
+					},
+					"login": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"senha",
+					"login"
+				],
+				"type": "object"
 			}
 		},
 		"securitySchemes": {}
@@ -31,7 +102,163 @@
 	},
 	"openapi": "3.0.0",
 	"paths": {
-		"/login/post": {
+		"/cards": {
+			"get": {
+				"operationId": "GetCards",
+				"responses": {
+					"200": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/CardResponse"
+									},
+									"type": "array"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": []
+			},
+			"post": {
+				"operationId": "CreateNewCard",
+				"responses": {
+					"201": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/CardResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CardRequest"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/cards/{cardId}": {
+			"put": {
+				"operationId": "UpdateCard",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/CardResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "cardId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CardRequest"
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"operationId": "DeleteCard",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/CardResponse"
+									},
+									"type": "array"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "cardId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/login": {
 			"post": {
 				"operationId": "Login",
 				"responses": {
@@ -44,10 +271,30 @@
 								}
 							}
 						}
+					},
+					"403": {
+						"description": "Forbidden",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
 					}
 				},
 				"security": [],
-				"parameters": []
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/LoginRequest"
+							}
+						}
+					}
+				}
 			}
 		}
 	},
