@@ -29,7 +29,7 @@ export class CardsController {
     }
 
     @Delete('{cardId}')
-    @Security('bearer')
+    @Security('jwt')
     @Response<ErrorResponse>(404, 'Not Found')
     public async deleteCard(@Path('cardId') id: string): Promise<Array<CardResponse>> {
         return await deleteCard(id);

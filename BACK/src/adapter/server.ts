@@ -1,11 +1,12 @@
 import cors from 'cors';
 import dotenv from 'dotenv';
 import morgan from 'morgan';
-import express from 'express';
+import express, { Request, Response } from 'express';
 import { createConnection } from 'typeorm';
 import swaggerUi from 'swagger-ui-express';
 import {Express} from 'express-serve-static-core';
 import method_override from 'method-override';
+import moment from 'moment';
 
 import { router } from '../controllers'
 import { exceptionHandler } from '../services'
@@ -30,7 +31,25 @@ export async function initServer(): Promise<Express> {
     
     server.use(express.static("public"));
     
-    server.use(morgan('combined'));
+    morgan.token('localDate', () => moment().format('DD/MM/YYYY HH:mm:SS'))
+    morgan.token('cardId', (req: Request, _res: Response) => req.url.split('/')[2])
+    morgan.token('cardTitulo', (req: Request, _res: Response) => req.body.titulo)
+    morgan.token('remAlt', function(req: Request, res: Response) {
+        if(req.method == 'PUT') {
+            return 'Alterar'
+        } else if (req.method == 'DELETE') {
+            return 'Remover'
+        }
+
+        return ''
+    })
+
+    server.use(morgan(
+        ':localDate - Card :cardId - :cardTitulo - :remAlt', {
+        skip: function (req, res) {
+            return req.url == '/login' || (req.url == '/cards' && (req.method == 'GET' || req.method == 'POST'))
+        }
+    }));
     
     server.use("/docs", swaggerUi.serve, swaggerUi.setup(undefined, {
         swaggerOptions: {
