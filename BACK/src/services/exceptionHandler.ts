@@ -1,26 +1,23 @@
 import { Request, Response, NextFunction } from "express";
 
-import { CardNaoEncontrado, ErrorResponse, LoginInvalido } from "../model";
+import { CardNaoEncontrado, ErrorResponse, ValidationException, LoginInvalido, ValidationErrorResponse } from "../model";
 
-export function exceptionHandler(err: any, req: Request, res: Response, next: NextFunction) {
-    console.log("Exception handler: desconhecido")
-
+export function exceptionHandler(err: any, _req: Request, res: Response, next: NextFunction) {
     let response: ErrorResponse;
 
     if(err instanceof LoginInvalido) {
-        console.log("instanceof login")
         response = {message: err.message}
         return res.status(403).json(response)
     }
     if(err instanceof CardNaoEncontrado) {
-        console.log("instanceof Card")
         response = {message: err.message}
         return res.status(404).json(response)
     }
-
-    //TODO: adicionar tratativa de erro para campos invalidos
+    if(err instanceof ValidationException) {
+        const validationErrorResponse: ValidationErrorResponse = {message: err.message, fields: err.fields}
+        res.status(400).json(validationErrorResponse)
+    }
     
-    console.log(err)
     response = {message: "Erro desconhecido: " + err}
     res.status(500).json(response)
 }

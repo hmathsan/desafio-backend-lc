@@ -3,6 +3,15 @@
     "noImplicitAdditionalProperties": "throw-on-extras",
     "spec": {
       "outputDirectory": "public",
-      "specVersion": 3
-    }  
+      "specVersion": 3,
+      "securityDefinitions": {
+        "jwt": {
+          "type": "oauth2",
+          "authorizationUrl": "http://localhost:5000/login"
+        }
+      }
+    },
+    "routes": {
+      "authenticationModule": "./services/auth.ts"
+    }
 }

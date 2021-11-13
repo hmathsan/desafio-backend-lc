@@ -5,3 +5,4 @@ export * from './entities';
 export * from './loginResponse'
 export * from './cardRequest'
 export * from './cardResponse'
+export * from './validationErrorResponse'

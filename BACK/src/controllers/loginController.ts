@@ -1,8 +1,8 @@
-import { Route, Post, Response, Body } from 'tsoa';
+import { Route, Post, Response, Body, Tags } from 'tsoa';
 import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
 
-import { LoginRequest, LoginInvalido, LoginResponse, ErrorResponse } from "../model";
+import { LoginRequest, LoginInvalido, LoginResponse, ErrorResponse, ValidationErrorResponse } from "../model";
 
 dotenv.config();
 
@@ -13,8 +13,10 @@ const TOKEN_TEMPO = process.env.TOKEN_TEMPO || '30000'
 const SECRET = process.env.JWT_SECRET
 
 @Route("login")
+@Tags('Login')
 export class LoginController {
     @Post()
+    @Response<ValidationErrorResponse>(400, 'Bad Request')
     @Response<ErrorResponse>(403, 'Forbidden')
     public async login(@Body() loginReq: LoginRequest): Promise<LoginResponse> {
         if(loginReq.login == LOGIN && loginReq.senha == SENHA) {

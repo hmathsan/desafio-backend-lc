@@ -29,6 +29,65 @@
 				],
 				"type": "object"
 			},
+			"Field": {
+				"properties": {
+					"field": {
+						"type": "string"
+					},
+					"constraints": {
+						"properties": {},
+						"additionalProperties": {
+							"type": "string"
+						},
+						"type": "object"
+					}
+				},
+				"required": [
+					"field",
+					"constraints"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ValidationErrorResponse": {
+				"properties": {
+					"message": {
+						"type": "string"
+					},
+					"fields": {
+						"items": {
+							"$ref": "#/components/schemas/Field"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"message",
+					"fields"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"CardRequest": {
+				"properties": {
+					"titulo": {
+						"type": "string"
+					},
+					"conteudo": {
+						"type": "string"
+					},
+					"lista": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"titulo",
+					"conteudo",
+					"lista"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"ErrorResponse": {
 				"properties": {
 					"message": {
@@ -37,25 +96,6 @@
 				},
 				"required": [
 					"message"
-				],
-				"type": "object"
-			},
-			"CardRequest": {
-				"properties": {
-					"lista": {
-						"type": "string"
-					},
-					"conteudo": {
-						"type": "string"
-					},
-					"titulo": {
-						"type": "string"
-					}
-				},
-				"required": [
-					"lista",
-					"conteudo",
-					"titulo"
 				],
 				"type": "object"
 			},
@@ -76,21 +116,27 @@
 			},
 			"LoginRequest": {
 				"properties": {
-					"senha": {
+					"login": {
 						"type": "string"
 					},
-					"login": {
+					"senha": {
 						"type": "string"
 					}
 				},
 				"required": [
-					"senha",
-					"login"
+					"login",
+					"senha"
 				],
-				"type": "object"
+				"type": "object",
+				"additionalProperties": false
 			}
 		},
-		"securitySchemes": {}
+		"securitySchemes": {
+			"jwt": {
+				"type": "oauth2",
+				"flows": {}
+			}
+		}
 	},
 	"info": {
 		"title": "BACK",
@@ -120,7 +166,14 @@
 						}
 					}
 				},
-				"security": [],
+				"tags": [
+					"Cards"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
 				"parameters": []
 			},
 			"post": {
@@ -141,13 +194,20 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
+									"$ref": "#/components/schemas/ValidationErrorResponse"
 								}
 							}
 						}
 					}
 				},
-				"security": [],
+				"tags": [
+					"Cards"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
 				"parameters": [],
 				"requestBody": {
 					"required": true,
@@ -180,7 +240,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
+									"$ref": "#/components/schemas/ValidationErrorResponse"
 								}
 							}
 						}
@@ -196,7 +256,14 @@
 						}
 					}
 				},
-				"security": [],
+				"tags": [
+					"Cards"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
 				"parameters": [
 					{
 						"in": "path",
@@ -245,7 +312,14 @@
 						}
 					}
 				},
-				"security": [],
+				"tags": [
+					"Cards"
+				],
+				"security": [
+					{
+						"bearer": []
+					}
+				],
 				"parameters": [
 					{
 						"in": "path",
@@ -272,6 +346,16 @@
 							}
 						}
 					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ValidationErrorResponse"
+								}
+							}
+						}
+					},
 					"403": {
 						"description": "Forbidden",
 						"content": {
@@ -283,6 +367,9 @@
 						}
 					}
 				},
+				"tags": [
+					"Login"
+				],
 				"security": [],
 				"parameters": [],
 				"requestBody": {

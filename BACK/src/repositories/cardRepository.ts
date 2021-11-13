@@ -41,15 +41,11 @@ export const updateCardById = async (card: Card): Promise<Card> => {
 
 export const deleteCard = async (id: string): Promise<Array<Card>> => {
     const cardRepository = getRepository(Card);
-    console.log("cardById");
     const cardById = await cardRepository.findOne(id);
     if (cardById) {
-        console.log("deletando card");
         await cardRepository.delete(id);
-        console.log("retornando cards");
         return await cardRepository.find()
     } else {
         throw new CardNaoEncontrado("Card de id " + id + " não encontrado.")
     }
-
 }

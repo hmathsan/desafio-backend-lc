@@ -7,7 +7,8 @@ import swaggerUi from 'swagger-ui-express';
 import {Express} from 'express-serve-static-core';
 import method_override from 'method-override';
 
-import { router, exceptionHandler } from '../controllers'
+import { router } from '../controllers'
+import { exceptionHandler } from '../services'
 import dbConfig from './dbConfig';
 
 dotenv.config();

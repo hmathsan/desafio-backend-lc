@@ -13,7 +13,6 @@ export async function authenticate(req: Request, res: Response, next: NextFuncti
         const token = authHeader.split(' ');
 
         if(token.length < 2 || token[0] != 'Bearer') {
-            console.log(token)
             return res.sendStatus(401);
         } else {
             jwt.verify(token[1], SECRET!, (e, _usuario) => {
