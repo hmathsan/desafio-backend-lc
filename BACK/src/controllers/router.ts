@@ -34,11 +34,12 @@ router.get('/cards', authenticate, async (_req, res) => {
     }
 })
 
+//TODO: Validação dos campos de entrada
 router.post('/cards', authenticate, async (req, res) => {
     const controller = new CardsController();
     try {
         const response = await controller.createNewCard(req.body);
-        return res.status(201).json(response).location('/cards/' + response.id)
+        return res.status(201).location('/cards/' + response.id).json(response)
     } catch (e) {
         const response: ErrorResponse = {message: "Erro desconhecido: " + e}
         res.status(500).json(response)
