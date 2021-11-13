@@ -46,9 +46,7 @@ export async function initServer(): Promise<Express> {
 
     server.use(morgan(
         ':localDate - Card :cardId - :cardTitulo - :remAlt', {
-        skip: function (req, res) {
-            return req.url == '/login' || (req.url == '/cards' && (req.method == 'GET' || req.method == 'POST'))
-        }
+        skip: (req, _res) => !(req.method == 'PUT' || req.method == 'DELETE')
     }));
     
     server.use("/docs", swaggerUi.serve, swaggerUi.setup(undefined, {

@@ -9,7 +9,7 @@ dotenv.config();
 const LOGIN = process.env.DEFAULT_LOGIN
 const SENHA = process.env.DEFAULT_SENHA
 
-const TOKEN_TEMPO = process.env.TOKEN_TEMPO || '30000'
+const TOKEN_TEMPO = process.env.TOKEN_TEMPO || '600000'
 const SECRET = process.env.JWT_SECRET
 
 @Route("login")

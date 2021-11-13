@@ -11,7 +11,7 @@ services:
     volumes:
        - postgres:/data/postgres
     ports:
-      - "5432:5432"
+      - 5432:5432
     networks:
       - lc
     restart: unless-stopped
@@ -29,7 +29,7 @@ services:
   front:
     container_name: front
     build:
-      context: ../FRONT
+      context: ./FRONT
       dockerfile: Dockerfile
     volumes:
       - '.:/node_modules'
@@ -37,7 +37,27 @@ services:
       - 3000:3000
     networks:
       - lc
+    links:
+      - 'back'
     
+  back:
+    container_name: back
+    build:
+      context: ./BACK
+      dockerfile: Dockerfile
+    volumes: 
+      - '.:/node_modules'
+    ports:
+      - 5000:5000
+    networks:
+      - lc
+    links:
+      - 'postgres'
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+
 networks:
   lc:
     driver: bridge
